@@ -1,43 +1,67 @@
 # this file is only to the test
 
+from openai import OpenAI
 
-import openai
+base_url = "https://api.aimlapi.com/v1"
+api_key = "bfaa01c84dc1432482b30a8dd137d1c9"
+
+system_prompt = "You must receiver json with many items of menu, filter and order to low prices and give me."
 
 
+api = OpenAI(api_key=api_key, base_url=base_url)
 
 
-# Defina sua chave de API
-openai.api_key = "sk-Ds4DjBinqmbiEh6ZlAgn5314E0Rq5lCSERr7FEBX-GT3BlbkFJe29i65VSJbtlCC-pmXqtFhTIngKwW1nTdfyFR_gHAA"
+def orderToLowPrice(json):
+    user_prompt = json
 
-# Novo método para geração de texto
-def gerar_texto(prompt):
-    response = openai.Completion.create(
-        model="gpt-3.5-turbo",  # Defina o modelo corretamente
-        prompt=prompt,          # O prompt deve ser passado diretamente
-        max_tokens=100          # Limite de tokens na resposta
+    completion = api.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        temperature=0.7,
+        max_tokens=256,
     )
-    return response.choices[0].text.strip()  # Ajuste para capturar o texto gerado corretamente
 
-# Exemplo de uso
-texto = gerar_texto("Escreva um poema sobre o mar.")
-print(texto)
+    response = completion.choices[0].message.content
+
+    print(response)
+
+    return response
+    # print("User:", user_prompt)
+    # print("AI:", response)
 
 
-
-
-# from transformers import AutoModelForCausalLM, AutoTokenizer
-# import torch
+# test
+# orderToLowPrice("""[
+#   {
+#     "id": 3,
+#     "name": "empada",
+#     "description": "feito de massa de trigo e frango desfiado ao molho",
+#     "price": 12.4,
+#     "category": "lanche"
+#   },
+#   {
+#     "id": 7,
+#     "name": "chocolate",
+#     "description": "chocolate",
+#     "price": 11.9,
+#     "category": "doce"
+#   },
+#   {
+#     "id": 2,
+#     "name": "churrasco de carne",
+#     "description": "100g de carne bovina coxão mole",
+#     "price": 4.5,
+#     "category": "pestico"
+#   },
+#   {
+#     "id": 19,
+#     "name": "Heineken",
+#     "description": "cerveja de 600ml",
+#     "price": 10.0,
+#     "category": "bebida"
+#   }
 #
-# # Carregar o modelo e o tokenizer
-# model_name = "EleutherAI/gpt-j-6B"
-# tokenizer = AutoTokenizer.from_pretrained(model_name)
-# model = AutoModelForCausalLM.from_pretrained(model_name)
-#
-# # Função para gerar texto
-# def gerar_texto(prompt):
-#     inputs = tokenizer(prompt, return_tensors="pt")
-#     outputs = model.generate(inputs.input_ids, max_length=150)
-#     return tokenizer.decode(outputs[0], skip_special_tokens=True)
-#
-# # Exemplo de uso
-# print(gerar_texto("Era uma vez em um zoológico"))
+# ]""")

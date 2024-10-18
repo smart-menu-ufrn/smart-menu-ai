@@ -1,13 +1,9 @@
 from typing import List
 from fastapi import FastAPI
-from pydantic import BaseModel
+import models
+import chat
 
-class MenuItem(BaseModel):
-    id: int
-    name: str
-    description: str
-    price: int
-    category: str
+
 
 api: FastAPI = FastAPI(
     title="Smart Menu AI",
@@ -15,8 +11,10 @@ api: FastAPI = FastAPI(
 
 
 @api.post("/receiver/items/menu")
-def receiver_menu(items: List[MenuItem]) -> List[int]:
+def receiver_menu(items: List[models.MenuItem]) -> List[int]:
     # mandar para o chat
     # ele deverá organizar
     # receber e dar a resposta
-    return json
+    order = chat.orderToLowPrice(items)
+    print(order)
+    return order
